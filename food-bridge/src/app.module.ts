@@ -4,10 +4,11 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { DonorProfileModule } from './donor-profile/donor-profile.module.js';
+import { NgoProfileModule } from './ngo-profile/ngo-profile.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule, UsersModule, DonorProfileModule,
+  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -23,3 +24,4 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [AppService],
 })
 export class AppModule {}
+

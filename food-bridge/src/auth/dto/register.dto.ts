@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsIn, IsNotEmpty, IsString, MinLength } from "class-validator";
 import { UserRole } from "../../common/user-role.enum.js";
 
 export class RegisterDto{
@@ -22,4 +22,5 @@ export class RegisterDto{
     @IsEnum(UserRole)
     @IsIn([UserRole.DONOR, UserRole.NGO, UserRole.VOLUNTEER])
     role:UserRole;
+
 }

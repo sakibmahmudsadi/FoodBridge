@@ -5,7 +5,7 @@ import { UserRole } from "../../common/user-role.enum.js";
 @Entity('users')
 export class User{
     @PrimaryGeneratedColumn('uuid')
-    id:string;
+    userId:string;
 
     @Column()
     name: string;
@@ -22,7 +22,7 @@ export class User{
     @Column({type:"enum",enum:UserRole})
     role:UserRole;
 
-    @Column({name:'is_active',type:"boolean", default:false})
+    @Column({name:'is_active',type:'boolean', default:false})
     isActive:boolean;
 
     @CreateDateColumn()
