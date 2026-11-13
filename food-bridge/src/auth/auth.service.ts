@@ -4,6 +4,10 @@ import { DonorProfileService } from '../donor-profile/donor-profile.service.js';
 import { UserRole } from '../common/user-role.enum.js';
 import { DonorDto } from './dto/donor-register.dto.js';
 import { UsersService } from '../users/users.service.js';
+import { NgoDto } from './dto/ngo-register.dto.js';
+import { NgoProfileService } from '../ngo-profile/ngo-profile.service.js';
+import { VolunteerDto } from './dto/volunteer-register.dto.js';
+import { VolunteerProfileService } from '../volunteer-profile/volunteer-profile.service.js';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +15,8 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly dataSource: DataSource,
     private readonly donorProfileService: DonorProfileService,
+    private readonly ngoProfileService: NgoProfileService,
+    private readonly volunteerProfileService: VolunteerProfileService,
   ) {}
 
   async registerDonor(dto: DonorDto) {
@@ -48,5 +54,59 @@ export class AuthService {
     });
   }
 
-  async registerNgo(dto:)
+  async registerNgo(dto:NgoDto){
+      return await this.dataSource.transaction(
+        async (manager)=>{
+          const user = await this.userService.createUser(manager,{
+            name:dto.name,
+            phone:dto.phone,
+            email:dto.email,
+            password:dto.password,
+            role:UserRole.NGO
+          })
+
+           const profile = await this.ngoProfileService.createProfile(manager,user.userId,dto.regNo,dto.address);
+
+           return{
+            message: 'Registration successful.',
+            user: {
+              id: user.userId,
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              role: user.role,
+              isActive: user.isActive,
+            },
+            profile}
+        }
+      )
+  }
+
+  async registerVolunteer(dto:VolunteerDto){
+      return await this.dataSource.transaction(
+        async (manager)=>{
+          const user = await this.userService.createUser(manager,{
+            name:dto.name,
+            phone:dto.phone,
+            email:dto.email,
+            password:dto.password,
+            role:UserRole.VOLUNTEER
+          })
+
+          const profile = await this.volunteerProfileService.createProfile(manager,user.userId,dto.address);
+
+          return{
+            message: 'Registration successful.',
+            user: {
+              id: user.userId,
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              role: user.role,
+              isActive: user.isActive,
+            },
+            profile}
+        }
+      )
+  }
 }

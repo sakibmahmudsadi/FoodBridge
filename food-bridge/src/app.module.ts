@@ -5,10 +5,11 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { DonorProfileModule } from './donor-profile/donor-profile.module.js';
 import { NgoProfileModule } from './ngo-profile/ngo-profile.module.js';
+import { VolunteerProfileModule } from './volunteer-profile/volunteer-profile.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule,
+  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
