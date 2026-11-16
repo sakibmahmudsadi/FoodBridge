@@ -3,6 +3,7 @@ import { AuthService } from './auth.service.js';
 import { DonorDto } from './dto/donor-register.dto.js';
 import { NgoDto } from './dto/ngo-register.dto.js';
 import { VolunteerDto } from './dto/volunteer-register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,10 @@ export class AuthController {
     @Post('register/volunteer')
     registerVolunteer(@Body() dto:VolunteerDto){
         return this.authService.registerVolunteer(dto);
+    }
+
+    @Post("login")
+    login(@Body() dto:LoginDto){
+        return this.authService.login(dto);
     }
 }

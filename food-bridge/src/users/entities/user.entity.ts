@@ -22,9 +22,6 @@ export class User{
     @Column({type:"enum",enum:UserRole})
     role:UserRole;
 
-    @Column({name:'is_active',type:'boolean', default:false})
-    isActive:boolean;
-
     @CreateDateColumn()
     createdAt:Date;
 
