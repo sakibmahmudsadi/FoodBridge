@@ -25,13 +25,11 @@ export class AuthService {
   ) {}
 
   async registerDonor(dto: DonorDto) {
-    // Hash before opening the database transaction.
+    
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    // Keep both inserts in one transaction so a failed profile insert also
-    // rolls back the user insert.
     return this.dataSource.transaction(async (manager) => {
-      // The registration endpoint decides the role; don't trust dto.role.
+      
       const user = await this.userService.createUser(manager, {
         name: dto.name,
         email: dto.email,
@@ -40,13 +38,11 @@ export class AuthService {
         role: UserRole.DONOR
       });
 
-      // The saved user now has its generated ID. Use it with the donor address.
       const profile = await this.donorProfileService.createProfile(
         manager, user.userId,
         dto.address,
       );
 
-      // Return safe account fields only; never return the password.
       return {
         message: 'Registration successful.',
         user: {
@@ -62,8 +58,8 @@ export class AuthService {
   }
 
   async registerNgo(dto:NgoDto){
-      // Hash before opening the database transaction.
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
       return await this.dataSource.transaction(
         async (manager)=>{
@@ -92,8 +88,8 @@ export class AuthService {
   }
 
   async registerVolunteer(dto:VolunteerDto){
-      // Hash before opening the database transaction.
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
       return await this.dataSource.transaction(
         async (manager)=>{
@@ -122,18 +118,17 @@ export class AuthService {
   }
 
   async login(dto:LoginDto){
-    // Find the account 
+     
     const user = await this.userService.findUser(dto);
 
-    // no user
+    
     if (!user) {
-      throw new UnauthorizedException('Invalid email/phone or password.');}
+      throw new UnauthorizedException('No user found!');}
 
-    // Compare the submitted password with the bcrypt hash saved at registration.
     const passMatches = await bcrypt.compare(dto.password, user.password);
 
     if (!passMatches) {
-      throw new UnauthorizedException('Invalid email/phone or password.');
+      throw new UnauthorizedException('Wrong Info!');
     }
 
     const payload = {
