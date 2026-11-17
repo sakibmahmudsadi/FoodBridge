@@ -7,9 +7,13 @@ import { DonorProfileModule } from './donor-profile/donor-profile.module.js';
 import { NgoProfileModule } from './ngo-profile/ngo-profile.module.js';
 import { VolunteerProfileModule } from './volunteer-profile/volunteer-profile.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FoodCategoriesModule } from './food-categories/food-categories.module.js';
+import { DonationsModule } from './donations/donations.module.js';
 
 @Module({
   imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule,
+    FoodCategoriesModule,
+    DonationsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
