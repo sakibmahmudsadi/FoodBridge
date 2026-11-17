@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VolunteerProfile } from './entities/volunteer-profile.entity.js';
+import { VolunteerAvailability } from './entities/volunteer-availability.entity.js';
 import { VolunteerProfileService } from './volunteer-profile.service.js';
+import { VolunteerProfileController } from './volunteer-profile.controller.js';
+import { UsersModule } from '../users/users.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VolunteerProfile])],
+  imports: [TypeOrmModule.forFeature([VolunteerProfile, VolunteerAvailability]), UsersModule],
+  controllers: [VolunteerProfileController],
   providers: [VolunteerProfileService],
   exports:[VolunteerProfileService]
 })

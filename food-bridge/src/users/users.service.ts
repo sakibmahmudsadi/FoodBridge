@@ -27,4 +27,20 @@ export class UsersService {
             ],
         });
     }
+
+    async updateUser(
+        manager: EntityManager,
+        userId: string,
+        changes: { name?: string; phone?: string },
+    ): Promise<void> {
+        const data: { name?: string; phone?: string } = {};
+        if (changes.name !== undefined) data.name = changes.name;
+        if (changes.phone !== undefined) data.phone = changes.phone;
+        if (Object.keys(data).length === 0) return;
+        await manager.getRepository(User).update({ userId }, data);
+    }
+
+    async softDeleteUser(manager: EntityManager, userId: string): Promise<void> {
+        await manager.getRepository(User).softDelete({ userId });
+    }
 }

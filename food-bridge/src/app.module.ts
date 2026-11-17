@@ -15,8 +15,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1234',
-      database: 'FoodBridge',
+      password: 'Pastabasta@12345',
+      database: 'food_donation_db',
       autoLoadEntities: true,
       synchronize: true,
     })
