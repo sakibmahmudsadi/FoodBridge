@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity.js';
 import { EntityManager, Repository } from 'typeorm';
 import { RegisterDto } from '../auth/dto/register.dto.js';
 import { LoginDto } from '../auth/dto/login.dto.js';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateUserDto } from '../auth/dto/update-user.dto.js';
 
 @Injectable()
 export class UsersService {
@@ -48,4 +49,28 @@ export class UsersService {
             },
         });
     }
+
+    async updateUser (manager:EntityManager,userId:string,dto:UpdateUserDto):Promise<User>{
+        const userRepository = manager.getRepository(User);
+        const user = await userRepository.findOne({where:{userId}});
+        if (!user) {
+            throw new NotFoundException(`User not found!`);
+        }
+
+        if (dto.email !== undefined) user.email = dto.email;
+        if (dto.phone !== undefined) user.phone = dto.phone;
+        if (dto.name !== undefined) user.name = dto.name;
+        
+        return userRepository.save(user);
+    }
+
+    async softDeleteUser(userId:string,manager?:EntityManager):Promise<void>{
+        const repository = manager ? manager.getRepository(User) : this.userRepository;
+        const result = await repository.softDelete({userId});
+
+        if (!result.affected) {
+            throw new NotFoundException('User not found!');
+        }
+    }
+ 
 }

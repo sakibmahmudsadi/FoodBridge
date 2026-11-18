@@ -12,6 +12,9 @@ import { VolunteerProfileService } from '../volunteer-profile/volunteer-profile.
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto.js';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateDonorDto } from './dto/update-donor.dto.js';
+import { UpdateNgoDto } from './dto/update-ngo.dto.js';
+import { UpdateVolunteerDto } from './dto/update-volunteer.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -58,6 +61,79 @@ export class AuthService {
         },
       };
     });
+  }
+
+  async updateDonor(userId:string,dto: UpdateDonorDto){
+    return this.dataSource.transaction(async (manager)=>{
+      const user = await this.userService.updateUser(manager,userId,dto);
+      const profile = await this.donorProfileService.updateDonor(manager,userId, dto);
+      return {
+        message: 'Update successful.',
+        user: user && {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+        profile: {
+          userId: profile.userId,
+          address: profile.address,
+        },
+      };
+    })
+  }
+
+  async updateNgo(userId:string,dto: UpdateNgoDto){
+    return this.dataSource.transaction(async (manager)=>{
+      const user = await this.userService.updateUser(manager,userId,dto);
+      const profile = await this.ngoProfileService.updateProfile(manager,userId,dto);
+
+      return {
+        message: 'Update successful.',
+        user: {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+        profile: {
+          userId: profile.userId,
+          regNo: profile.regNo,
+          address: profile.address,
+          verificationStatus: profile.verificationStatus,
+        },
+      };
+    });
+  }
+
+  async updateVolunteer(userId:string,dto: UpdateVolunteerDto){
+    return this.dataSource.transaction(async (manager)=>{
+      const user = await this.userService.updateUser(manager,userId,dto);
+      const profile = await this.volunteerProfileService.updateProfile(manager,userId,dto);
+
+      return {
+        message: 'Update successful.',
+        user: {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+        profile: {
+          userId: profile.userId,
+          availability: profile.availability,
+          address: profile.address,
+        },
+      };
+    });
+  }
+
+  async deleteAccount(userId:string){
+    await this.userService.softDeleteUser(userId);
+    return { message: 'Account deleted successfully.' };
   }
 
   async registerNgo(dto:NgoDto){
