@@ -10,10 +10,11 @@ import { NgoVolunteersModule } from './ngo-volunteers/ngo-volunteers.module.js';
 import { ReservationsModule } from './reservations/reservations.module.js';
 import { AssignmentsModule } from './assignments/assignments.module.js';
 import { DeliveryRecordsModule } from './delivery-records/delivery-records.module.js';
+import { NgoReportsModule } from './ngo-reports/ngo-reports.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule, NgoVolunteersModule, ReservationsModule, AssignmentsModule, DeliveryRecordsModule,
+  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule, NgoVolunteersModule, ReservationsModule, AssignmentsModule, DeliveryRecordsModule, NgoReportsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
