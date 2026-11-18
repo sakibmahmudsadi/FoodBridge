@@ -7,45 +7,32 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Donation } from '../../donations/entities/donation.entity.js';
-import { Organization } from '../../organizations/entities/organization.entity.js';
-import { User } from '../../users/entities/user.entity.js';
-
-export enum ReservationStatus {
-  RESERVED = 'RESERVED',
-  ASSIGNED = 'ASSIGNED',
-  PICKED_UP = 'PICKED_UP',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-  FAILED = 'FAILED',
-}
+import { NgoProfile } from '../../ngo-profile/entities/ngo-profile.entity.js';
+import { ReservationStatus } from '../../common/reservation-status.enum.js';
 
 @Entity('reservations')
-@Index('idx_reservations_donation', ['donationId'])
+@Index('uq_one_live_reservation_per_donation', ['donationId'], {
+  unique: true,
+  where: `status IN ('RESERVED', 'ASSIGNED', 'PICKED_UP')`,
+})
+@Index(['ngoId', 'status'])
 export class Reservation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'donation_id', type: 'uuid' })
+  @Column('uuid', { name: 'donation_id' })
   donationId: string;
 
-  @ManyToOne(() => Donation, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Donation, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'donation_id' })
   donation: Donation;
 
-  @Column({ name: 'ngo_organization_id', type: 'uuid' })
-  ngoOrganizationId: string;
+  @Column('uuid', { name: 'ngo_id' })
+  ngoId: string;
 
-  @ManyToOne(() => Organization, { nullable: false, onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'ngo_organization_id' })
-  ngoOrganization: Organization;
-
-  @Column({ name: 'reserved_by', type: 'uuid' })
-  reservedById: string;
-
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'reserved_by' })
-  reservedBy: User;
+  @ManyToOne(() => NgoProfile, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'ngo_id' })
+  ngo: NgoProfile;
 
   @Column({
     type: 'enum',
@@ -54,10 +41,15 @@ export class Reservation {
   })
   status: ReservationStatus;
 
-  @Column({
-    name: 'reserved_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Column({ name: 'reserved_at', type: 'timestamptz' })
   reservedAt: Date;
+
+  @Column({ name: 'cancelled_at', type: 'timestamptz', nullable: true })
+  cancelledAt: Date | null;
+
+  @Column({ name: 'cancellation_reason', type: 'text', nullable: true })
+  cancellationReason: string | null;
+
+  @Column({ name: 'delivered_at', type: 'timestamptz', nullable: true })
+  deliveredAt: Date | null;
 }

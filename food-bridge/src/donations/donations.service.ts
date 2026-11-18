@@ -12,6 +12,7 @@ import {
   type FindOptionsWhere,
   type Repository,
 } from 'typeorm';
+import { ReservationStatus } from '../common/reservation-status.enum.js';
 import { UserRole } from '../common/user-role.enum.js';
 import { DonorProfile } from '../donor-profile/entities/donor-profile.entity.js';
 import { FoodCategory } from '../food-categories/entities/food-category.entity.js';
@@ -19,10 +20,7 @@ import {
   OrganizationKind,
   OrganizationStatus,
 } from '../organizations/entities/organization.entity.js';
-import {
-  Reservation,
-  ReservationStatus,
-} from '../reservations/entities/reservation.entity.js';
+import { Reservation } from '../reservations/entities/reservation.entity.js';
 import { DonationStatus } from './donation-status.enum.js';
 import { DonationUnit } from './donation-unit.enum.js';
 import type { CreateDonationDto } from './dtos/create-donation.dto.js';

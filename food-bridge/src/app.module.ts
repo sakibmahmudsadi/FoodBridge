@@ -10,6 +10,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodCategoriesModule } from './food-categories/food-categories.module.js';
 import { DonationsModule } from './donations/donations.module.js';
 import { OrganizationsModule } from './organizations/organizations.module.js';
+import { NgoVolunteersModule } from './ngo-volunteers/ngo-volunteers.module.js';
+import { ReservationsModule } from './reservations/reservations.module.js';
+import { AssignmentsModule } from './assignments/assignments.module.js';
+import { DeliveryRecordsModule } from './delivery-records/delivery-records.module.js';
+import { NgoReportsModule } from './ngo-reports/ngo-reports.module.js';
 
 @Module({
   imports: [
@@ -21,6 +26,11 @@ import { OrganizationsModule } from './organizations/organizations.module.js';
     FoodCategoriesModule,
     DonationsModule,
     OrganizationsModule,
+    NgoVolunteersModule,
+    ReservationsModule,
+    AssignmentsModule,
+    DeliveryRecordsModule,
+    NgoReportsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST ?? '127.0.0.1',

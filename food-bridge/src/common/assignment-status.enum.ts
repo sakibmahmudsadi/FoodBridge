@@ -1,0 +1,7 @@
+export enum AssignmentStatus {
+  OFFERED = 'OFFERED',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+  CANCELLED = 'CANCELLED',
+  COMPLETED = 'COMPLETED',
+}
