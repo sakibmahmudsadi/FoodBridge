@@ -27,34 +27,41 @@
 
 ## Project setup
 
+Create the local practice database `foodbridge_donor_dev` in pgAdmin. Copy `.env.example` to `.env`, enter your PostgreSQL login, and use `openssl rand -hex 32` to generate `JWT_SECRET`. Use `DB_SYNC=true` with the practice database so TypeORM can create the tables.
+
 ```bash
-$ pnpm install
+npm install
 ```
 
 ## Compile and run the project
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+npm run start:dev -- --env-file .env
 ```
+
+## Donor workflow in Postman
+
+Use an admin account and a donor account. The `POST /auth/register/donor` response includes `user.id`, which you need for approval. Log in at `POST /auth/login` with `emailOrPhone` and `password`. Use the returned JWT as a Bearer token.
+
+1. As admin, call `POST /organizations/donors/:userId/approve` with `{}`. Approval creates a donor organization and links earlier drafts. To assign another donor to the same organization, include its `organizationId` in that donor's approval request.
+2. As admin, create a category with `POST /food-categories` and `{"name":"Cooked Meals"}`. Copy its `data.id`. Try list, detail, edit, and delete using a separate unused category for the delete request.
+3. As donor, create a draft with `POST /donations`. Supply `title`, `categoryId`, `quantity` as a decimal string, `unit`, `pickupAddress`, `area`, `availableFrom`, `pickupDeadline`, and `declaredUseByAt`. Use a future pickup deadline and keep the dates in that order. Copy the donation's `data.id`.
+4. List your organization's drafts with `GET /donations?status=DRAFT&page=1&limit=10`. Use `GET /donations/:id` for detail and `PATCH /donations/:id` to edit it. Add `categoryId` to the list query to filter by category.
+5. Publish with `POST /donations/:id/publish` and withdraw the available listing with `POST /donations/:id/cancel`. Use a separate draft to demonstrate soft deletion with `DELETE /donations/:id`.
+
+The guards read the user ID from the JWT. The service checks the user's approved organization, validates the donation, and saves it through TypeORM. The response interceptor wraps category and donation results in `data` and puts pagination in `meta`.
 
 ## Run tests
 
 ```bash
 # unit tests
-$ pnpm run test
+$ npm run test
 
 # e2e tests
-$ pnpm run test:e2e
+$ npm run test:e2e
 
 # test coverage
-$ pnpm run test:cov
+$ npm run test:cov
 ```
 
 ## Deployment
