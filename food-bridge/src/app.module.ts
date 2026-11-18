@@ -1,0 +1,33 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
+import { DonorProfileModule } from './donor-profile/donor-profile.module.js';
+import { NgoProfileModule } from './ngo-profile/ngo-profile.module.js';
+import { VolunteerProfileModule } from './volunteer-profile/volunteer-profile.module.js';
+import { NgoVolunteersModule } from './ngo-volunteers/ngo-volunteers.module.js';
+import { ReservationsModule } from './reservations/reservations.module.js';
+import { AssignmentsModule } from './assignments/assignments.module.js';
+import { DeliveryRecordsModule } from './delivery-records/delivery-records.module.js';
+import { NgoReportsModule } from './ngo-reports/ngo-reports.module.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule, NgoVolunteersModule, ReservationsModule, AssignmentsModule, DeliveryRecordsModule, NgoReportsModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'Pastabasta@12345',
+      database: 'food_donation_db',
+      autoLoadEntities: true,
+      synchronize: true,
+    })
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
