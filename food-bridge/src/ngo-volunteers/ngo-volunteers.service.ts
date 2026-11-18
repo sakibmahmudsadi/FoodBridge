@@ -5,8 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { NgoVolunteer } from './entities/ngo-volunteer.entity.js';
+import { CollectionAssignment } from '../assignments/entities/collection-assignment.entity.js';
+import { AssignmentStatus } from '../common/assignment-status.enum.js';
 import { NgoProfile } from '../ngo-profile/entities/ngo-profile.entity.js';
 import { VolunteerProfile } from '../volunteer-profile/entities/volunteer-profile.entity.js';
 import { MembershipStatus } from '../common/membership-status.enum.js';
@@ -24,6 +26,7 @@ export class NgoVolunteersService {
     private readonly ngoProfileRepository: Repository<NgoProfile>,
     @InjectRepository(VolunteerProfile)
     private readonly volunteerProfileRepository: Repository<VolunteerProfile>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async invite(ngoId: string, dto: InviteVolunteerDto) {
@@ -147,18 +150,58 @@ export class NgoVolunteersService {
     const membership = await this.getMembership(id);
     this.checkUserCanAccess(user, membership);
 
-    if (
-      membership.status !== MembershipStatus.INVITED &&
-      membership.status !== MembershipStatus.ACTIVE
-    ) {
-      throw new ConflictException('This membership is already closed');
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const lockedMembership = await queryRunner.manager.findOne(NgoVolunteer, {
+        where: { id: id },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!lockedMembership) {
+        throw new NotFoundException('Membership not found');
+      }
+      if (
+        lockedMembership.status !== MembershipStatus.INVITED &&
+        lockedMembership.status !== MembershipStatus.ACTIVE
+      ) {
+        throw new ConflictException('This membership is already closed');
+      }
+
+      const liveAssignment = await queryRunner.manager.findOne(
+        CollectionAssignment,
+        {
+          where: {
+            membershipId: id,
+            status: In([AssignmentStatus.OFFERED, AssignmentStatus.ACCEPTED]),
+          },
+        },
+      );
+      if (liveAssignment) {
+        throw new ConflictException(
+          'This volunteer has a live collection task and cannot be removed now',
+        );
+      }
+
+      await queryRunner.manager.update(NgoVolunteer, id, {
+        status: MembershipStatus.REMOVED,
+        removedAt: new Date(),
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
 
-    membership.status = MembershipStatus.REMOVED;
-    membership.removedAt = new Date();
-    await this.ngoVolunteerRepository.save(membership);
-
-    return this.toResponse(membership);
+    const removedMembership = await this.getMembership(id);
+    return this.toResponse(removedMembership);
   }
 
   async checkNgoIsVerified(ngoId: string) {

@@ -5,11 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
+import { DataSource, FindOptionsWhere, In, Repository } from 'typeorm';
 import { Reservation } from './entities/reservation.entity.js';
 import { Donation } from '../donations/entities/donation.entity.js';
+import { CollectionAssignment } from '../assignments/entities/collection-assignment.entity.js';
 import { DonationStatus } from '../donations/donation-status.enum.js';
 import { ReservationStatus } from '../common/reservation-status.enum.js';
+import { AssignmentStatus } from '../common/assignment-status.enum.js';
 import { UserRole } from '../common/user-role.enum.js';
 import type { AuthUser } from '../common/current-user.decorator.js';
 import {
@@ -167,6 +169,15 @@ export class ReservationsService {
       }
 
       const now = await getDatabaseTime(queryRunner);
+
+      await queryRunner.manager.update(
+        CollectionAssignment,
+        {
+          reservationId: id,
+          status: In([AssignmentStatus.OFFERED, AssignmentStatus.ACCEPTED]),
+        },
+        { status: AssignmentStatus.CANCELLED, endedAt: now },
+      );
 
       await queryRunner.manager.update(Reservation, id, {
         status: ReservationStatus.CANCELLED,

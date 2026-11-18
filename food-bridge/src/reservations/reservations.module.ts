@@ -6,11 +6,13 @@ import { FoodCategory } from '../food-categories/entities/food-category.entity.j
 import { ReservationsService } from './reservations.service.js';
 import { ReservationsController } from './reservations.controller.js';
 import { NgoVolunteersModule } from '../ngo-volunteers/ngo-volunteers.module.js';
+import { AssignmentsModule } from '../assignments/assignments.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Reservation, Donation, FoodCategory]),
     NgoVolunteersModule,
+    AssignmentsModule,
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService],

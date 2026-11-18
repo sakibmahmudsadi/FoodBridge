@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ReservationsService } from './reservations.service.js';
+import { AssignmentsService } from '../assignments/assignments.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt.guards.js';
 import { RolesGuard } from '../common/roles.guard.js';
 import { Roles } from '../common/roles.decorator.js';
@@ -19,11 +20,15 @@ import { UserRole } from '../common/user-role.enum.js';
 import { CreateReservationDto } from './dto/create-reservation.dto.js';
 import { CancelReservationDto } from './dto/cancel-reservation.dto.js';
 import { QueryReservationsDto } from './dto/query-reservations.dto.js';
+import { OfferAssignmentDto } from '../assignments/dto/offer-assignment.dto.js';
 
 @Controller('reservations')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ReservationsController {
-  constructor(private readonly reservationsService: ReservationsService) {}
+  constructor(
+    private readonly reservationsService: ReservationsService,
+    private readonly assignmentsService: AssignmentsService,
+  ) {}
 
   @Post()
   @Roles(UserRole.NGO)
@@ -55,5 +60,15 @@ export class ReservationsController {
     @Body() dto: CancelReservationDto,
   ) {
     return this.reservationsService.cancel(user.userID, id, dto);
+  }
+
+  @Post(':id/assignments')
+  @Roles(UserRole.NGO)
+  offerAssignment(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: OfferAssignmentDto,
+  ) {
+    return this.assignmentsService.offer(user.userID, id, dto);
   }
 }
