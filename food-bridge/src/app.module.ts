@@ -9,24 +9,30 @@ import { VolunteerProfileModule } from './volunteer-profile/volunteer-profile.mo
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodCategoriesModule } from './food-categories/food-categories.module.js';
 import { DonationsModule } from './donations/donations.module.js';
+import { OrganizationsModule } from './organizations/organizations.module.js';
 
 @Module({
-  imports: [AuthModule, UsersModule, DonorProfileModule, NgoProfileModule, VolunteerProfileModule,
+  imports: [
+    AuthModule,
+    UsersModule,
+    DonorProfileModule,
+    NgoProfileModule,
+    VolunteerProfileModule,
     FoodCategoriesModule,
     DonationsModule,
+    OrganizationsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '1234',
-      database: 'FoodBridge',
+      host: process.env.DB_HOST ?? '127.0.0.1',
+      port: Number(process.env.DB_PORT ?? 5432),
+      username: process.env.DB_USER ?? 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME ?? 'foodbridge_donor_dev',
       autoLoadEntities: true,
-      synchronize: true,
-    })
+      synchronize: process.env.DB_SYNC === 'true',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
-

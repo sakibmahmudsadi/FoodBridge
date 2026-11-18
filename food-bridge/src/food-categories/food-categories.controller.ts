@@ -13,7 +13,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ResponseEnvelopeInterceptor } from '../common/interceptors/response-envelope.interceptor.js';
 import { UserRole } from '../common/user-role.enum.js';
 import { JwtAuthGuard } from '../donor-catalogue-auth/jwt-auth.guard.js';
 import { Roles } from '../donor-catalogue-auth/roles.decorator.js';
@@ -24,6 +26,7 @@ import { FoodCategoriesService } from './food-categories.service.js';
 
 @Controller('food-categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ResponseEnvelopeInterceptor)
 export class FoodCategoriesController {
   constructor(private readonly foodCategoriesService: FoodCategoriesService) {}
 

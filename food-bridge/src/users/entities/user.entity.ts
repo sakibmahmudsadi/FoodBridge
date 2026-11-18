@@ -1,33 +1,49 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from "typeorm";
-import { PrimaryGeneratedColumn } from "typeorm/browser";
-import { UserRole } from "../../common/user-role.enum.js";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from '../../common/user-role.enum.js';
+import { Organization } from '../../organizations/entities/organization.entity.js';
 
 @Entity('users')
-export class User{
-    @PrimaryGeneratedColumn('uuid')
-    userId:string;
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  userId: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({unique:true})
-    email: string;
+  @Column({ unique: true })
+  email: string;
 
-    @Column({unique:true})
-    phone: string;
+  @Column({ unique: true })
+  phone: string;
 
-    @Column()
-    password: string;
+  @Column()
+  password: string;
 
-    @Column({type:"enum",enum:UserRole})
-    role:UserRole;
+  @Column({ type: 'enum', enum: UserRole })
+  role: UserRole;
 
-    @CreateDateColumn()
-    createdAt:Date;
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  organizationId: string | null;
 
-    @UpdateDateColumn()
-    updatedAt:Date;
+  @ManyToOne(() => Organization, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'organization_id' })
+  organization?: Organization | null;
 
-    @DeleteDateColumn()
-    deletedAt:Date;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
