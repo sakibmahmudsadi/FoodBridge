@@ -1,9 +1,14 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, UpdateDateColumn } from "typeorm";
+import type { Relation } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm/browser";
 import { UserRole } from "../../common/user-role.enum.js";
+import { DonorProfile } from "../../donor-profile/entities/donor-profile.entity.js";
+import { NgoProfile } from "../../ngo-profile/entities/ngo-profile.entity.js";
+import { VolunteerProfile } from "../../volunteer-profile/entities/volunteer-profile.entity.js";
 
 @Entity('users')
 export class User{
+    
     @PrimaryGeneratedColumn('uuid')
     userId:string;
 
@@ -30,4 +35,13 @@ export class User{
 
     @DeleteDateColumn()
     deletedAt:Date;
+
+    @OneToOne(() => DonorProfile, donorProfile => donorProfile.user)
+    donorProfile: Relation<DonorProfile>;
+
+    @OneToOne(() => NgoProfile, ngoProfile => ngoProfile.user)
+    ngoProfile: Relation<NgoProfile>;
+
+    @OneToOne(() => VolunteerProfile, volunteerProfile => volunteerProfile.user)
+    volunteerProfile: Relation<VolunteerProfile>;
 }

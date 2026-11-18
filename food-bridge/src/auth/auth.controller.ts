@@ -5,14 +5,6 @@ import { NgoDto } from './dto/ngo-register.dto.js';
 import { VolunteerDto } from './dto/volunteer-register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { JwtAuthGuard } from './guards/jwt.guards.js';
-import type { Request } from 'express';
-
-type AuthenticatedRequest = Request & {
-    user: {
-        userID: string;
-        userRole: string;
-    };
-};
 
 @Controller('auth')
 export class AuthController {
@@ -38,9 +30,11 @@ export class AuthController {
         return this.authService.login(dto);
     }
 
+    /*Auth guard testing*/
     @Get('about-me')
     @UseGuards(JwtAuthGuard)
-    aboutMe(@Req() request: AuthenticatedRequest){
-        return request.user;
+    getUserInfo(@Req() request: any){
+        return this.authService.getUserInfo(request.user.userId);
     }
+
 }

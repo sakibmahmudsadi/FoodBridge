@@ -27,4 +27,25 @@ export class UsersService {
             ],
         });
     }
+
+    async getUserInfo(userId:string):Promise<User|null>{
+        return this.userRepository.findOne({
+            where: { userId },
+            relations: {
+                donorProfile: true,
+                ngoProfile: true,
+                volunteerProfile: true,
+            },
+            select: {
+                userId: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                donorProfile: true,
+                ngoProfile: true,
+                volunteerProfile: true,
+            },
+        });
+    }
 }

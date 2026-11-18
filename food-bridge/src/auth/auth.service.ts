@@ -52,7 +52,10 @@ export class AuthService {
           phone: user.phone,
           role: user.role,
         },
-        profile,
+        profile: {
+          userId: profile.userId,
+          address: profile.address,
+        },
       };
     });
   }
@@ -82,7 +85,12 @@ export class AuthService {
               phone: user.phone,
               role: user.role,
             },
-            profile}
+            profile: {
+              userId: profile.userId,
+              regNo: profile.regNo,
+              address: profile.address,
+              verificationStatus: profile.verificationStatus,
+            }}
         }
       )
   }
@@ -112,7 +120,11 @@ export class AuthService {
               phone: user.phone,
               role: user.role,
             },
-            profile}
+            profile: {
+              userId: profile.userId,
+              availability: profile.availability,
+              address: profile.address,
+            }}
         }
       )
   }
@@ -132,11 +144,49 @@ export class AuthService {
     }
 
     const payload = {
-      userID: user.userId,
+      userId: user.userId,
       userRole: user.role,
     };
 
     return this.jwt.sign(payload);
-    
+  }
+
+  async getUserInfo(userId:string){
+    const user = await this.userService.getUserInfo(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    let profile;
+
+    if (user.role === UserRole.DONOR) {
+      profile = user.donorProfile && {
+        userId: user.donorProfile.userId,
+        address: user.donorProfile.address,
+      };
+    } else if (user.role === UserRole.NGO) {
+      profile = user.ngoProfile && {
+        userId: user.ngoProfile.userId,
+        regNo: user.ngoProfile.regNo,
+        address: user.ngoProfile.address,
+        verificationStatus: user.ngoProfile.verificationStatus,
+      };
+    } else if (user.role === UserRole.VOLUNTEER) {
+      profile = user.volunteerProfile && {
+        userId: user.volunteerProfile.userId,
+        availability: user.volunteerProfile.availability,
+        address: user.volunteerProfile.address,
+      };
+    }
+
+    return {
+      userId: user.userId,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      profile,
+    };
   }
 }

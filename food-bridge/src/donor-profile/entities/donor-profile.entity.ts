@@ -1,14 +1,15 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import type { Relation } from "typeorm";
 import { User } from "../../users/entities/user.entity.js";
 
 @Entity("donor_profile")
 export class DonorProfile{
-    @PrimaryColumn('uuid',{ name: 'user_id' })
+    @PrimaryColumn('uuid')
     userId:string;
 
-    @OneToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-    user:User;
+    @OneToOne(() => User, user => user.donorProfile, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' })
+    user:Relation<User>;
 
     @Column()
     address: string;
